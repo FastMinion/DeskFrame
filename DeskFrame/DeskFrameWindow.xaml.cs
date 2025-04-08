@@ -76,8 +76,8 @@ namespace DeskFrame
         {
             var sortOptions = new Dictionary<int, Func<IEnumerable<FileItem>, IOrderedEnumerable<FileItem>>>
             {
-                { (int)SortBy.NameAsc, items => items.OrderBy(i => i.Name, StringComparer.OrdinalIgnoreCase) },
-                { (int)SortBy.NameDesc, items => items.OrderByDescending(i => i.Name, StringComparer.OrdinalIgnoreCase) },
+                { (int)SortBy.NameAsc, items => items.OrderBy(i => i.FileName, StringComparer.OrdinalIgnoreCase) },
+                { (int)SortBy.NameDesc, items => items.OrderByDescending(i => i.FileName, StringComparer.OrdinalIgnoreCase) },
                 { (int)SortBy.DateModifiedAsc, items => items.OrderBy(i => i.DateModified) },
                 { (int)SortBy.DateModifiedDesc, items => items.OrderByDescending(i => i.DateModified) }
             };
@@ -578,7 +578,7 @@ namespace DeskFrame
                         if (token.IsCancellationRequested) return false;
                         var fileItem = item as FileItem;
                         return string.IsNullOrWhiteSpace(filter) ||
-                               Regex.IsMatch(fileItem.Name!, regexPattern, RegexOptions.IgnoreCase);
+                               Regex.IsMatch(fileItem.FileName!, regexPattern, RegexOptions.IgnoreCase);
                     });
                 }, token);
 
@@ -820,6 +820,20 @@ namespace DeskFrame
         {
             Instance.IsLocked = !Instance.IsLocked;
         }
+        private void OpenFolder()
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo(_path) { UseShellExecute = true });
+            }
+            catch // (Exception ex)
+            { }
+        }
+
+        private void ToggleFileExtension()
+        {
+            Instance.ShowFileExtension = !Instance.ShowFileExtension;
+        }
 
         private async void LoadFiles(string path)
         {
@@ -885,6 +899,10 @@ namespace DeskFrame
                         }
                     }
 
+                    Regex? blacklistRegex = Instance.FileExtensionBlacklistRegex != null
+                            ? new Regex(Instance.FileExtensionBlacklistRegex)
+                            : null;
+                    string itemName;
                     foreach (var entry in fileEntries)
                     {
                         if (loadFiles_cts.IsCancellationRequested)
@@ -895,9 +913,20 @@ namespace DeskFrame
 
                         if (existingItem == null)
                         {
+                            if (blacklistRegex != null && Instance.ShowFileExtension)
+                            {
+                                itemName = blacklistRegex.Replace(entry.Name, "");
+                            }
+                            else
+                            {
+                                itemName = Instance.ShowFileExtension 
+                                    ? entry.Name
+                                    : Path.GetFileNameWithoutExtension(entry.FullName);
+                            }
                             var fileItem = new FileItem
                             {
-                                Name = entry.Name,
+                                Name = itemName,
+                                FileName = entry.Name,
                                 FullPath = entry.FullName,
                                 DateModified = entry is FileInfo fileInfo ? fileInfo.LastWriteTime : ((DirectoryInfo)entry).LastWriteTime,
                                 Thumbnail = await GetThumbnailAsync(entry.FullName)
@@ -907,6 +936,16 @@ namespace DeskFrame
                         }
                         else
                         {
+                            if (blacklistRegex != null && Instance.ShowFileExtension)
+                            {
+                                existingItem.Name = blacklistRegex!.Replace(entry.Name, "");
+                            }
+                            else
+                            {
+                                existingItem.Name = Instance.ShowFileExtension
+                                    ? entry.Name
+                                    : Path.GetFileNameWithoutExtension(entry.FullName);
+                            }
                             existingItem.DateModified = entry is FileInfo fileInfo ? fileInfo.LastWriteTime : ((DirectoryInfo)entry).LastWriteTime;
                             existingItem.Thumbnail = await GetThumbnailAsync(entry.FullName);
                         }
@@ -1319,8 +1358,14 @@ namespace DeskFrame
         {
             ContextMenu contextMenu = new ContextMenu();
 
+            MenuItem openInExplorer = new MenuItem { Header = "Open In Explorer" };
+            openInExplorer.Click += (_, _) => { OpenFolder(); };
+
             MenuItem toggleHiddenFiles = new MenuItem { Header = Instance.ShowHiddenFiles ? "Hide hidden Files" : "Show hidden files" };
             toggleHiddenFiles.Click += (s, args) => { ToggleHiddenFiles(); LoadFiles(_path); };
+
+            MenuItem toggleFileExtension = new MenuItem { Header = Instance.ShowFileExtension ? "Hide File Extensions" : "Show File Extensions" };
+            toggleFileExtension.Click += (_, _) => { ToggleFileExtension(); LoadFiles(_path); };
 
             MenuItem frameSettings = new MenuItem { Header = "Frame Settings" };
             frameSettings.Click += (s, args) =>
@@ -1442,6 +1487,7 @@ namespace DeskFrame
             contextMenu.Items.Add(lockFrame);
             contextMenu.Items.Add(reloadItems);
             contextMenu.Items.Add(toggleHiddenFiles);
+            contextMenu.Items.Add(toggleFileExtension);
             contextMenu.Items.Add(frameSettings);
 
             sortByMenuItem.Items.Add(nameMenuItem);
@@ -1453,6 +1499,7 @@ namespace DeskFrame
             contextMenu.Items.Add(sortByMenuItem);
 
             contextMenu.Items.Add(new Separator());
+            contextMenu.Items.Add(openInExplorer);
             contextMenu.Items.Add(exitItem);
 
             contextMenu.IsOpen = true;
@@ -1474,7 +1521,9 @@ namespace DeskFrame
             private int _maxHeight = 40;
             private TextTrimming _textTrimming = TextTrimming.CharacterEllipsis;
             private string? _displayName;
+            private string? _fileName;
             public string? Name { get; set; }
+            public string? FileName { get; set; }
             public string? FullPath { get; set; }
             public BitmapSource? Thumbnail { get; set; }
             public DateTime DateModified { get; set; }
@@ -1487,6 +1536,16 @@ namespace DeskFrame
                 {
                     _displayName = value;
                     OnPropertyChanged(nameof(DisplayName));
+                }
+            }
+
+            public string NameWithExtension
+            {
+                get => FileName;
+                private set
+                {
+                    _fileName = value;
+                    OnPropertyChanged(nameof(NameWithExtension));
                 }
             }
 

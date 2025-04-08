@@ -12,12 +12,12 @@
         Background="#66232323" 
         WindowStyle="None" 
         ResizeMode="NoResize"
-        Height="432" 
+        Height="464" 
         Width="490"
         MinWidth="0"
         MinHeight="0">
     <Grid>
-        <ui:TitleBar Title="Frame Settings" Name="Titlebar" Padding="8,0,0,0" Height="30" CanMaximize="False" ShowMinimize="False" ApplicationTheme="Dark" ShowMaximize="False">
+        <ui:TitleBar Title="Frame Settings" Name="Titlebar" Padding="8,0,0,0" Height="30" CanMaximize="False" ShowMinimize="False" ApplicationTheme="Dark" ShowMaximize="False" CloseClicked="Titlebar_CloseClicked">
             <ui:TitleBar.Icon>
                 <ui:ImageIcon Source="/ico.png" Margin="0,0,6,0" />
             </ui:TitleBar.Icon>
@@ -38,9 +38,13 @@
                     <Label Content="Border Color (hex):"  VerticalAlignment="Center"/>
                 </StackPanel>
                 <TextBox x:Name="BorderColorTextBox" Margin="0,0,0,20" TextChanged="TextChangedHandler"/>
+                
                 <Label Content="File Filter (regex):" Height="30" />
                 <TextBox x:Name="FileFilterRegexTextBox" Margin="0,0,0,20" TextChanged="TextChangedHandler"/>
 
+                <Label Content="File Extension Blacklist (regex):" Height="30"/>
+                <TextBox x:Name="FileExtensionBlacklistRegexTextBox" Margin="0,0,0,20" TextChanged="TextChangedHandler"/>
+                
                 <StackPanel Orientation="Horizontal">
                     <ui:Button  x:Name="FilesBackgroundColorButton" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="1,1,5,0" Icon="{ui:SymbolIcon Color24}" Padding="-10" Click="FilesBackgroundColorButton_Click"/>
                     <Label Content="Files Background color (hex):" Height="30"/>
@@ -81,7 +85,7 @@
                 </ComboBox>
 
 
-                <Button x:Name="RevertButton" HorizontalAlignment="Right" Content="Revert" Height="30" Click="RevertButton_Click" />
+                <Button x:Name="RevertButton" Margin="0,25,0,0" HorizontalAlignment="Right" Content="Revert" Height="30" Click="RevertButton_Click" />
             </StackPanel>
          
         </Grid>

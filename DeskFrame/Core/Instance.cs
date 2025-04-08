@@ -16,6 +16,7 @@ public class Instance : INotifyPropertyChanged
     private string _folder;
     private bool _minimized;
     private bool _showHiddenFiles;
+    private bool _showFileExtension;
     private bool _isLocked;
     private string _titleBarColor = "#0C000000";
     private string _titleTextColor = "#FFFFFF";
@@ -24,6 +25,7 @@ public class Instance : INotifyPropertyChanged
     private Forms.HorizontalAlignment _titleTextAlignment = Forms.HorizontalAlignment.Center;
     private string? _titleText;
     private string _fileFilterRegex = "";
+    private string _fileExtensionBlacklist = "";
     private string _listViewBackgroundColor = "#0C000000";
     private int _opacity = 26;
     private int _sortBy = 1;
@@ -125,6 +127,18 @@ public class Instance : INotifyPropertyChanged
             {
                 _showHiddenFiles = value;
                 OnPropertyChanged(nameof(ShowHiddenFiles), value.ToString());
+            }
+        }
+    }
+    public bool ShowFileExtension
+    {
+        get => _showFileExtension;
+        set
+        {
+            if (_showFileExtension != value)
+            {
+                _showFileExtension = value;
+                OnPropertyChanged(nameof(ShowFileExtension), value.ToString());
             }
         }
     }
@@ -232,6 +246,18 @@ public class Instance : INotifyPropertyChanged
             }
         }
     }
+    public string FileExtensionBlacklistRegex
+    {
+        get => _fileExtensionBlacklist;
+        set
+        {
+            if (_fileExtensionBlacklist != value)
+            {
+                _fileExtensionBlacklist = value;
+                OnPropertyChanged(nameof(FileExtensionBlacklistRegex), value);
+            }
+        }
+    }
 
     public string ListViewBackgroundColor
     {
@@ -281,6 +307,7 @@ public class Instance : INotifyPropertyChanged
         _minimized = instance._minimized;
         _folder = instance._folder;
         _showHiddenFiles = instance._showHiddenFiles;
+        _showFileExtension = instance._showFileExtension;
         _isLocked = instance._isLocked;
         _titleBarColor = instance._titleBarColor;
         _titleTextColor = instance._titleTextColor;
@@ -288,6 +315,7 @@ public class Instance : INotifyPropertyChanged
         _borderEnabled = instance._borderEnabled;
         _titleTextAlignment = instance._titleTextAlignment;
         _fileFilterRegex = instance._fileFilterRegex;
+        _fileExtensionBlacklist = instance._fileExtensionBlacklist;
         _listViewBackgroundColor = instance._listViewBackgroundColor;
         _opacity = instance._opacity;
         _sortBy = instance._sortBy;
@@ -303,6 +331,7 @@ public class Instance : INotifyPropertyChanged
         _minimized = false;
         _folder = "empty";
         _showHiddenFiles = false;
+        _showFileExtension = true;
         _isLocked = false;
 
     }

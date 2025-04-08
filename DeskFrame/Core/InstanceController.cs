@@ -27,6 +27,7 @@ public class InstanceController
                 key.SetValue("Height", instance.Height!);
                 key.SetValue("Minimized", instance.Minimized!);
                 key.SetValue("ShowHiddenFiles", instance.ShowHiddenFiles!);
+                key.SetValue("ShowFileExtension", instance.ShowFileExtension!);
                 key.SetValue("IsLocked", instance.IsLocked!);
                 key.SetValue("TitleBarColor", instance.TitleBarColor!);
                 key.SetValue("TitleTextColor", instance.TitleTextColor!);
@@ -63,6 +64,7 @@ public class InstanceController
                 key.SetValue("Minimized", instance.Minimized!);
                 key.SetValue("Folder", instance.Folder!);
                 key.SetValue("ShowHiddenFiles", instance.ShowHiddenFiles!);
+                key.SetValue("ShowFileExtension", instance.ShowFileExtension!);
                 key.SetValue("IsLocked", instance.IsLocked!);
                 key.SetValue("TitleBarColor", instance.TitleBarColor!);
                 key.SetValue("TitleTextColor", instance.TitleTextColor!);
@@ -71,6 +73,7 @@ public class InstanceController
                 key.SetValue("BorderColor", instance.BorderColor!);
                 key.SetValue("BorderEnabled", instance.BorderEnabled!);
                 key.SetValue("FileFilterRegex", instance.FileFilterRegex!);
+                key.SetValue("FileExtensionBlacklistRegex", instance.FileExtensionBlacklistRegex!);
                 key.SetValue("ListViewBackgroundColor", instance.ListViewBackgroundColor!);
                 key.SetValue("Opacity", instance.Opacity);
                 key.SetValue("SortBy", instance.SortBy);
@@ -214,6 +217,10 @@ public class InstanceController
                                                 temp.ShowHiddenFiles = bool.Parse(value.ToString()!);
                                                 Debug.WriteLine($"ShowHiddenFiles added\t{temp.ShowHiddenFiles}");
                                                 break;
+                                            case "ShowFileExtension":
+                                                temp.ShowFileExtension = bool.Parse(value.ToString()!);
+                                                Debug.WriteLine($"ShowFileExtension added\t{temp.ShowFileExtension}");
+                                                break;
                                             case "IsLocked":
                                                 temp.IsLocked = bool.Parse(value.ToString()!);
                                                 Debug.WriteLine($"IsLocked added\t{temp.IsLocked}");
@@ -247,6 +254,10 @@ public class InstanceController
                                             case "FileFilterRegex":
                                                 temp.FileFilterRegex = value.ToString()!;
                                                 Debug.WriteLine($"FileFilterRegex added\t{temp.FileFilterRegex}");
+                                                break;
+                                            case "FileExtensionBlacklistRegex":
+                                                temp.FileExtensionBlacklistRegex = value.ToString()!;
+                                                Debug.WriteLine($"FileExtensionBlacklistRegex added\t{temp.FileExtensionBlacklistRegex}");
                                                 break;
                                             case "ListViewBackgroundColor":
                                                 temp.ListViewBackgroundColor = value.ToString()!;
