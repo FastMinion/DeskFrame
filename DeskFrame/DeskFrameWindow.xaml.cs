@@ -820,14 +820,16 @@ namespace DeskFrame
         {
             Instance.IsLocked = !Instance.IsLocked;
         }
-        private void OpenFolder()
+        private void ExecutePath(string path)
         {
             try
             {
-                Process.Start(new ProcessStartInfo(_path) { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
             }
             catch // (Exception ex)
-            { }
+            {
+                //  MessageBox.Show($"Error opening file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void ToggleFileExtension()
@@ -1051,14 +1053,7 @@ namespace DeskFrame
             }
             if (e.ClickCount == 2 && sender is Border border && border.DataContext is FileItem clickedItem)
             {
-                try
-                {
-                    Process.Start(new ProcessStartInfo(clickedItem.FullPath!) { UseShellExecute = true });
-                }
-                catch //(Exception ex)
-                {
-                    //  MessageBox.Show($"Error opening file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                ExecutePath(clickedItem.FullPath!);
             }
             else if (e.LeftButton == MouseButtonState.Pressed && sender is Border dragBorder)
             {
@@ -1359,7 +1354,7 @@ namespace DeskFrame
             ContextMenu contextMenu = new ContextMenu();
 
             MenuItem openInExplorer = new MenuItem { Header = "Open In Explorer" };
-            openInExplorer.Click += (_, _) => { OpenFolder(); };
+            openInExplorer.Click += (_, _) => { ExecutePath(_path); };
 
             MenuItem toggleHiddenFiles = new MenuItem { Header = Instance.ShowHiddenFiles ? "Hide hidden Files" : "Show hidden files" };
             toggleHiddenFiles.Click += (s, args) => { ToggleHiddenFiles(); LoadFiles(_path); };
